@@ -1,0 +1,5 @@
+bucket         = "REPLACE_WITH_S3_BUCKET_NAME"           # e.g. yourname-terraform-state-prod
+key            = "REPLACE_WITH/STATE/FILE/PATH.tfstate"  # e.g. envs/dev/networking/terraform.tfstate
+region         = "REPLACE_WITH_AWS_REGION"               # e.g. us-east-1
+dynamodb_table = "REPLACE_WITH_DYNAMODB_TABLE_NAME"       # e.g. terraform-locks
+encrypt        = true

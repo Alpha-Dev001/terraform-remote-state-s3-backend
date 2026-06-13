@@ -1,0 +1,33 @@
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files — contain sensitive data, never commit these.
+# For state-backend/, this is the bootstrap local state.
+# For every other project, state lives remotely in S3.
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Variable files often contain sensitive data
+*.tfvars
+*.tfvars.json
+
+# Override files (local-only overrides)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+# Real backend config (keep only backend.hcl.example in git)
+backend.hcl
+
+# OS / editor files
+.DS_Store
+*.swp
