@@ -1,56 +1,52 @@
 # Terraform Remote State Setup
 
-This project sets up a reusable, secure remote backend for Terraform state
-using **AWS S3** (storage) and **DynamoDB** (state locking).
+Reusable backend for Terraform state using S3 (storage) + DynamoDB (locking).
 
 ## Structure
+
+```
 terraform-remote-state/
-
-├── state-backend/              # Bootstraps the S3 bucket + DynamoDB table
-
+├── state-backend/
 │   ├── providers.tf
-
 │   ├── variables.tf
-
 │   ├── main.tf
-
 │   └── outputs.tf
-
 ├── shared-backend-config/
-
-│   └── backend.hcl.example     # Template for other projects to use this backend
-
+│   └── backend.hcl.example
 ├── docs/
-
-│   └── remote-state.md         # Explanation of the architecture
-
+│   └── remote-state.md
 └── .gitignore
+```
 
-## Step 1: Bootstrap the backend (one-time setup)
+- `state-backend/` - creates the S3 bucket + DynamoDB table (local state)
+- `shared-backend-config/` - backend.hcl template for other projects
+- `docs/` - notes on how/why this works
 
-This creates the S3 bucket and DynamoDB table that *other* projects will
-use as their remote backend. It runs with **local state**, since it
-creates the very backend it would otherwise depend on.
+## 1. Bootstrap the backend (one-time)
+
+Runs with local state since it creates the backend itself.
 
 ```powershell
 cd state-backend
 terraform init
-terraform plan -var="bucket_name=yourname-terraform-state-prod"
 terraform apply -var="bucket_name=yourname-terraform-state-prod"
-```
-
-After applying, get the outputs:
-
-```powershell
 terraform output
 ```
 
-## Step 2: Use this backend in another project
+## 2. Point another project at it
 
-1. Copy `shared-backend-config/backend.hcl.example` to `backend.hcl` in
-   your new project and fill in the values from the outputs above
-   (pick a unique `key` per project/environment).
-2. Add an empty backend block in that project:
+Copy `shared-backend-config/backend.hcl.example` to `backend.hcl`, fill in
+the bucket/table/region from the outputs above, and give it a unique `key`:
+
+```hcl
+bucket         = "yourname-terraform-state-prod"
+key            = "envs/dev/networking/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "terraform-locks"
+encrypt        = true
+```
+
+Add an empty backend block:
 
 ```hcl
 terraform {
@@ -58,19 +54,14 @@ terraform {
 }
 ```
 
-3. Initialize with:
+Then:
 
 ```powershell
 terraform init -backend-config=backend.hcl
 ```
 
-## More details
+## Notes
 
-See [`docs/remote-state.md`](docs/remote-state.md) for the full explanation
-of why this setup exists and how it all fits together.
-
-## ⚠️ Important
-
-- Never commit `*.tfstate` or `backend.hcl` (real values) — see `.gitignore`.
-- The S3 bucket has `prevent_destroy = true` — it cannot be accidentally
-  deleted via `terraform destroy`.
+- `prevent_destroy = true` on the bucket, so it can't get wiped accidentally.
+- Don't commit `*.tfstate` or real `backend.hcl` files.
+- See `docs/remote-state.md` for more detail.
