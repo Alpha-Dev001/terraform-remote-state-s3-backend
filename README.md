@@ -1,11 +1,16 @@
 # Terraform Remote State Setup
 
+![Terraform Checks](https://github.com/YOUR_USERNAME/terraform-remote-state-s3-backend/actions/workflows/terraform.yml/badge.svg)
+
 Reusable backend for Terraform state using S3 (storage) + DynamoDB (locking).
 
 ## Structure
 
 ```
 terraform-remote-state/
+├── .github/
+│   └── workflows/
+│       └── terraform.yml
 ├── state-backend/
 │   ├── providers.tf
 │   ├── variables.tf
@@ -23,6 +28,7 @@ terraform-remote-state/
 └── .gitignore
 ```
 
+- `.github/workflows/` - CI: runs fmt check + validate on push/PR
 - `state-backend/` - creates the S3 bucket + DynamoDB table (local state)
 - `example-project/` - sample project that uses the remote backend
 - `shared-backend-config/` - backend.hcl template for other projects
