@@ -11,6 +11,11 @@ terraform-remote-state/
 │   ├── variables.tf
 │   ├── main.tf
 │   └── outputs.tf
+├── example-project/
+│   ├── providers.tf
+│   ├── variables.tf
+│   ├── main.tf
+│   └── outputs.tf
 ├── shared-backend-config/
 │   └── backend.hcl.example
 ├── docs/
@@ -19,6 +24,7 @@ terraform-remote-state/
 ```
 
 - `state-backend/` - creates the S3 bucket + DynamoDB table (local state)
+- `example-project/` - sample project that uses the remote backend
 - `shared-backend-config/` - backend.hcl template for other projects
 - `docs/` - notes on how/why this works
 
@@ -58,6 +64,18 @@ Then:
 
 ```powershell
 terraform init -backend-config=backend.hcl
+```
+
+## 3. Try the example project
+
+```powershell
+cd example-project
+Copy-Item ..\shared-backend-config\backend.hcl.example backend.hcl
+# edit backend.hcl: bucket/region/dynamodb_table from state-backend outputs,
+# key = "envs/dev/example-project/terraform.tfstate"
+
+terraform init -backend-config=backend.hcl
+terraform apply -var="bucket_name=yourname-example-bucket-dev"
 ```
 
 ## Notes
